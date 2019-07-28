@@ -123,7 +123,7 @@ REPLACE="
 
 print_modname() {
   ui_print "*******************************"
-  ui_print "     Magisk Module Template    "
+  ui_print "    MiK's Development Module   "
   ui_print "*******************************"
 }
 
@@ -134,6 +134,14 @@ on_install() {
   # Extend/change the logic to whatever you want
   ui_print "- Extracting module files"
   unzip -o "$ZIPFILE" 'system/*' -d $MODPATH >&2
+
+  # 将不同功能逻辑编写为带注释函数
+  # 归类于本文件底部自定义函数区域
+  # 在此处调用各功能逻辑并明确注释
+  # 禁止在此处编写功能逻辑
+
+  ## 调用示例功能安装逻辑
+  custom_on_install_function__example
 }
 
 # Only some special files require specific permissions
@@ -149,6 +157,29 @@ set_permissions() {
   # set_perm  $MODPATH/system/bin/app_process32   0     2000    0755      u:object_r:zygote_exec:s0
   # set_perm  $MODPATH/system/bin/dex2oat         0     2000    0755      u:object_r:dex2oat_exec:s0
   # set_perm  $MODPATH/system/lib/libart.so       0     0       0644
+
+  # 同 on_install 内注释
+
+  ## 调用示例功能权限设置
+  custom_set_permissions_function__example
 }
 
 # You can add more functions to assist your custom script code
+
+### 自定义示例开始
+# # 安装逻辑
+#   无参数
+#   无返回值
+#   输出文本
+custom_on_install_function__example() {
+  ui_print "--示例功能逻辑输出开始#"
+  ui_print "- 设备架构: $ARCH"
+  ui_print "- 系统 API 级别: $API"
+  ui_print "- Magisk 版本: $MAGISK_VER"
+  ui_print "--示例功能逻辑输出结束#"
+}
+# # 权限设置
+custom_set_permissions_function__example() {
+  ui_print "--示例功能无需设置权限#"
+}
+### 自定义示例结束

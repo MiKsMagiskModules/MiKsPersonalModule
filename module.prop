@@ -1,6 +1,6 @@
-id=template
-name=Template Module
-version=v1
-versionCode=1
-author=topjohnwu
-description=A short description
+id=MiK_DevModule
+name=MiK 的开发模块
+version=v0.0.1
+versionCode=000000001
+author=MiK
+description=想起啥来加啥
