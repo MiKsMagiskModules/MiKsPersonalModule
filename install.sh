@@ -142,6 +142,9 @@ on_install() {
 
   ## 调用示例功能安装逻辑
   custom_on_install_function__example
+  
+  ## 调用字体功能安装逻辑
+  custom_on_install_function__fonts
 }
 
 # Only some special files require specific permissions
@@ -162,6 +165,9 @@ set_permissions() {
 
   ## 调用示例功能权限设置
   custom_set_permissions_function__example
+  
+  ## 调用字体功能权限设置
+  custom_set_permissions_function__fonts
 }
 
 # You can add more functions to assist your custom script code
@@ -176,6 +182,9 @@ custom_on_install_function__example() {
   ui_print "- 设备架构: $ARCH"
   ui_print "- 系统 API 级别: $API"
   ui_print "- Magisk 版本: $MAGISK_VER"
+  ui_print "- ZIPFILE: $ZIPFILE"
+  ui_print "- TMPDIR: $TMPDIR"
+  ui_print "- MODPATH: $MODPATH"
   ui_print "--示例功能逻辑输出结束#"
 }
 # # 权限设置
@@ -183,3 +192,57 @@ custom_set_permissions_function__example() {
   ui_print "--示例功能无需设置权限#"
 }
 ### 自定义示例结束
+
+### 字体开始
+# # 安装逻辑
+#   无参数
+#   无返回值
+#   补全 /system/etc/fonts.xml 中的字重，抽取对应字体文件到 /system/fonts 目录下
+custom_on_install_function__fonts() {
+  ui_print "--字体功能开始安装#"
+  # 准备相关变量
+  if [[ -d /sbin/.magisk/mirror ]]; then
+    _MIRRORDIR=/sbin/.magisk/mirror
+  elif [[ -d /sbin/.core/mirror ]]; then
+    _MIRRORDIR=/sbin/.core/mirror
+  else
+    unset _MIRRORDIR
+  fi
+
+  FILE=fonts.xml
+  FILEPATH=/system/etc/
+  FONTFILESDIR=/system/fonts/
+
+  if [ -f $_MIRRORDIR$FILEPATH$FILE ]; then
+    mkdir -p $MODPATH$FILEPATH
+    cp -af $_MIRRORDIR$FILEPATH$FILE $MODPATH$FILEPATH$FILE
+    mkdir -p $MODPATH$FONTFILESDIR
+    if [ "$(cat $FILEPATH$FILE |grep '<family lang="zh-Hans">')" ]; then
+      ui_print "- Process zh-Hans"
+      sed -i '/<family lang="zh-Hans">/,/<\/family>/ {
+        s/<family lang="zh-Hans">/<family lang="zh-Hans">\n<font weight="100" style="normal">NotoSansCJKsc-Thin.otf<\/font>\n<font weight="300" style="normal">NotoSansCJKsc-Light.otf<\/font>\n<font weight="350" style="normal">NotoSansCJKsc-DemiLight.otf<\/font>\n<font weight="400" style="normal">NotoSansCJKsc-Regular.otf<\/font>\n<font weight="500" style="normal">NotoSansCJKsc-Medium.otf<\/font>\n<font weight="700" style="normal">NotoSansCJKsc-Bold.otf<\/font>\n<font weight="900" style="normal">NotoSansCJKsc-Black.otf<\/font>\n<\/family>\n<family lang="zh-Hans">/;
+      }' $MODPATH$FILEPATH$FILE
+      ui_print "- Copy zh-Hans otf files"
+      unzip -oj "$ZIPFILE" "common/system/fonts/NotoSansCJKsc-*" -d $MODPATH$FONTFILESDIR >&2
+    fi
+    if [ "$(cat $FILEPATH$FILE |grep '<family lang="zh-Hant">')" ]; then
+      ui_print "- Process zh-Hant"
+      #sed -i
+    fi
+    if [ "$(cat $FILEPATH$FILE |grep '<family lang="ja">')" ]; then
+      ui_print "- Process ja"
+      #sed -i
+    fi
+    if [ "$(cat $FILEPATH$FILE |grep '<family lang="ko">')" ]; then
+      ui_print "- Process ko"
+      #sed -i
+    fi
+  else
+    ui_print "--字体功能安装失败(无法获取原始 fonts.xml)#"
+  fi
+}
+# # 权限设置
+custom_set_permissions_function__fonts() {
+  ui_print "--字体功能无需设置权限#"
+}
+### 字体结束
